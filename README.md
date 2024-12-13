@@ -13,8 +13,6 @@ MmpCoin Core [MMP]
 
 ## This branch contains the latest version 2.0.0 of the mmpcoin network.
 
-(Credits to BlobMaster41)
-
 ## What is MmpCoin?
 MmpCoin is the twin of DogeCoin, born before it, and just seen the lights now. [Visit blockchain explorer](https://mmpcoin.com/)
 
@@ -33,7 +31,7 @@ The JSON-RPC API provided by MmpCoin Core is self-documenting and can be browsed
 ### How much mmpcoin can exist?
 Max supply of 500,000,000 coins with special rewards system.
 
-### How to get $bel?
+### How to get $mmp?
 Scrypt Proof of Work
 
 1 Minute Block Targets, 4 Hour Diff Readjustments
