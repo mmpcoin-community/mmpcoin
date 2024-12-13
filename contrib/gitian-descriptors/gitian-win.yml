@@ -23,7 +23,7 @@ packages:
 - "python"
 - "rename"
 remotes:
-- "url": "https://github.com/yarsawyer/bellscoinv2.git"
+- "url": "https://github.com/yarsawyer/mmpcoin.git"
   "dir": "bells"
 files: []
 script: |

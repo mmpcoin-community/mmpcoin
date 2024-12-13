@@ -43,7 +43,7 @@ jobs:
 
     - name: Set permission
       run: |
-        cd .. && chmod 777 -R ./bellscoinv2 && cd ./bellscoinv2 
+        cd .. && chmod 777 -R ./mmpcoin && cd ./mmpcoin 
 
     - name: Dependency cache
       uses: actions/cache@v3

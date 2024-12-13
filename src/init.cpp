@@ -512,8 +512,8 @@ std::string HelpMessage(HelpMessageMode mode)
 
 std::string LicenseInfo()
 {
-    const std::string URL_SOURCE_CODE = "<https://github.com/bellscoin-community/bellscoinv2>";
-    const std::string URL_WEBSITE = "<https://github.com/bellscoin-community/bellscoinv2>";
+    const std::string URL_SOURCE_CODE = "<https://github.com/bellscoin-community/mmpcoin>";
+    const std::string URL_WEBSITE = "<https://github.com/bellscoin-community/mmpcoin>";
 
     return CopyrightHolders(strprintf(_("Copyright (C) %i-%i"), 2013, COPYRIGHT_YEAR) + " ") + "\n" +
            "\n" +
