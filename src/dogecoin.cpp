@@ -135,7 +135,21 @@ CAmount GetDogecoinBlockSubsidy(int nHeight, const Consensus::Params& consensusP
     } else {
 
         int rand = generateMTRandom(nHeight, 1000);
-        if (nHeight < 129600) {
+
+        if (nHeight < 50000){ //luckcoin
+            std::string cseed_str = prevHash.ToString().substr(8,7);
+            const char* cseed = cseed_str.c_str();
+            long seed = hex2long(cseed);
+
+            int rand = generateMTRandom(seed, 100000);
+
+            if(rand > 30000 && rand < 35001)
+                nSubsidy = 188 * COIN;
+            else if(rand > 70000 && rand < 71001)
+                nSubsidy = 588 * COIN;
+            else if(rand > 50000 && rand < 50011)
+                nSubsidy = 5888 * COIN;
+        }else if (nHeight < 129600) { // bellscoin
             if(rand >= 990) {
                 nSubsidy = 10000 * COIN;
             } else if (rand >= 940) {
@@ -175,6 +189,22 @@ CAmount GetDogecoinBlockSubsidy(int nHeight, const Consensus::Params& consensusP
             } else if (rand <= 499) {
                 nSubsidy = 5 * COIN;
             }
+        } else {
+            // Subsidy is cut in half every 100,000 blocks, which will occur approximately every 2 months
+            nSubsidy >>= (nHeight / 100000); // Luckycoin: 100K blocks in ~2 months
+
+            std::string cseed_str = prevHash.ToString().substr(8,7);
+            const char* cseed = cseed_str.c_str();
+            long seed = hex2long(cseed);
+
+            int rand = generateMTRandom(seed, 100000);
+
+            if(rand > 30000 && rand < 35001)
+                nSubsidy *= 2;
+            else if(rand > 70000 && rand < 71001)
+                nSubsidy *= 5;
+            else if(rand > 50000 && rand < 50011)
+                nSubsidy *= 58;
         }
     }
 
