@@ -1,5 +1,5 @@
 <h1 align="center">
-<img src="https://belscan.io/images/logo.png" data-canonical-src="https://belscan.io/images/logo.png" width="250" height="250" alt="MmpCoin"/>
+<img src="https://mmpcoin.com/images/logo.png" data-canonical-src="https://mmpcoin.com/images/logo.png" width="250" height="250" alt="MmpCoin"/>
 <br/><br/>
 MmpCoin Core [MMP]
 </h1>
@@ -16,7 +16,7 @@ MmpCoin Core [MMP]
 (Credits to BlobMaster41)
 
 ## What is MmpCoin?
-MmpCoin is the twin of DogeCoin, born before it, and just seen the lights now. [Visit blockchain explorer](https://belscan.io/)
+MmpCoin is the twin of DogeCoin, born before it, and just seen the lights now. [Visit blockchain explorer](https://mmpcoin.com/)
 
 ## Development and contributions
 Developers work in their own trees, then submit pull requests when they think

@@ -191,7 +191,7 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0x5b2a3f53f605d62c53e62932dac6925e3d74afa5a4b459745c36d42d0ed26a69"));
 
         // Note that of those with the service bits flag, most only support a subset of possible options
-        vSeeds.push_back(CDNSSeedData("belscan.io", "seeder.belscan.io", true));
+        vSeeds.push_back(CDNSSeedData("mmpcoin.com", "seeder.mmpcoin.com", true));
         vSeeds.push_back(CDNSSeedData("quark.blue", "bdnsseeder.quark.blue"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,25);
@@ -361,8 +361,8 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0x5b2a3f53f605d62c53e62932dac6925e3d74afa5a4b459745c36d42d0ed26a69"));
 
         // nodes with support for servicebits filtering should be at the top
-        vSeeds.push_back(CDNSSeedData("belscan.io", "testnetseed.belscan.io", true));
-        vSeeds.push_back(CDNSSeedData("belscan.io", "testnetseeder.belscan.io", true));
+        vSeeds.push_back(CDNSSeedData("mmpcoin.com", "testnetseed.mmpcoin.com", true));
+        vSeeds.push_back(CDNSSeedData("mmpcoin.com", "testnetseeder.mmpcoin.com", true));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,25);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,30);
@@ -518,8 +518,8 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0x5b2a3f53f605d62c53e62932dac6925e3d74afa5a4b459745c36d42d0ed26a69"));
 
         // nodes with support for servicebits filtering should be at the top
-        vSeeds.push_back(CDNSSeedData("belscan.io", "testnetseed.belscan.io", true));
-        vSeeds.push_back(CDNSSeedData("belscan.io", "testnetseeder.belscan.io", true));
+        vSeeds.push_back(CDNSSeedData("mmpcoin.com", "testnetseed.mmpcoin.com", true));
+        vSeeds.push_back(CDNSSeedData("mmpcoin.com", "testnetseeder.mmpcoin.com", true));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,25);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,30);
