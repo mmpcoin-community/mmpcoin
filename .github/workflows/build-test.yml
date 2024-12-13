@@ -161,7 +161,7 @@ jobs:
           path: ~/.ccache
           key: ${{ matrix.name }}-${{ env.cache-name }}-${{ hashFiles('**/configure.ac', '.github/workflows/ci.yml') }}
 
-      - name: Build Bellscoin
+      - name: Build Mmpcoin
         run: |
           depends/${{ matrix.host }}/native/bin/ccache --max-size="$CCACHE_SIZE"
           ./autogen.sh
@@ -195,5 +195,5 @@ jobs:
           name: mmpcoin-${{ github.sha }}-${{ matrix.name }}
           path: |
             depends/${{ matrix.host }}/bin/mmpcoin*
-            dist/Bellscoin-Qt.app
+            dist/Mmpcoin-Qt.app
             ${{ matrix.name }}-bench.csv

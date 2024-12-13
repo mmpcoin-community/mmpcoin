@@ -50,7 +50,7 @@ static const int MAX_URI_LENGTH = 255;
 #define SPINNER_FRAMES 36
 
 #define QAPP_ORG_NAME "Bells"
-#define QAPP_ORG_DOMAIN "BELLSCOIN.DOMAIN"
+#define QAPP_ORG_DOMAIN "MMPCOIN.DOMAIN"
 #define QAPP_APP_NAME_DEFAULT "Bells-Qt"
 #define QAPP_APP_NAME_TESTNET "Bells-Qt-testnet"
 

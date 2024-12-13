@@ -1,7 +1,7 @@
 <h1 align="center">
 <img src="https://belscan.io/images/logo.png" data-canonical-src="https://belscan.io/images/logo.png" width="250" height="250" alt="Bells"/>
 <br/><br/>
-Bells Core [BEL]
+Bells Core [MMP]
 </h1>
 
 <div align="center">

@@ -64,7 +64,7 @@ jobs:
       with:
         languages: ${{ matrix.language }}
 
-    - name: Build Bellscoin
+    - name: Build Mmpcoin
       run: |
        ./autogen.sh
        ./configure --prefix="$PWD"/depends/x86_64-pc-linux-gnu
