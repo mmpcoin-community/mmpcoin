@@ -29,16 +29,16 @@
   <string>????</string>
 
   <key>CFBundleExecutable</key>
-  <string>Bells-Qt</string>
+  <string>MmpCoin-Qt</string>
 
   <key>CFBundleName</key>
-  <string>Bells-Qt</string>
+  <string>MmpCoin-Qt</string>
 
   <key>LSHasLocalizedDisplayName</key>
   <true/>
 
   <key>CFBundleIdentifier</key>
-  <string>com.mmpcoin.Bells-Qt</string>
+  <string>com.mmpcoin.MmpCoin-Qt</string>
 
   <key>CFBundleURLTypes</key>
   <array>
@@ -60,7 +60,7 @@
       <key>UTTypeIdentifier</key>
       <string>com.mmpcoin.paymentrequest</string>
       <key>UTTypeDescription</key>
-      <string>Bells payment request</string>
+      <string>MmpCoin payment request</string>
       <key>UTTypeConformsTo</key>
       <array>
         <string>public.data</string>

@@ -36,7 +36,7 @@ Check out the source code in the following directory hierarchy.
     git clone https://github.com/devrandom/gitian-builder.git
     git clone https://github.com/dogecoin/dogecoin.git
 
-### Bells maintainers/release engineers, update version in sources
+### MmpCoin maintainers/release engineers, update version in sources
 
 Update the following:
 

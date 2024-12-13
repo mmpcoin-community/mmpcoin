@@ -1,12 +1,12 @@
 <h1 align="center">
-<img src="https://belscan.io/images/logo.png" data-canonical-src="https://belscan.io/images/logo.png" width="250" height="250" alt="Bells"/>
+<img src="https://belscan.io/images/logo.png" data-canonical-src="https://belscan.io/images/logo.png" width="250" height="250" alt="MmpCoin"/>
 <br/><br/>
-Bells Core [MMP]
+MmpCoin Core [MMP]
 </h1>
 
 <div align="center">
 
-[![BellsBadge](https://img.shields.io/badge/Bells-Coin-blue)](https://dogecoin.com)
+[![BellsBadge](https://img.shields.io/badge/MmpCoin-Coin-blue)](https://dogecoin.com)
 [![MuchWow](https://img.shields.io/badge/OG-Coin-yellow.svg)](https://dogecoin.com)
 
 </div>
@@ -15,8 +15,8 @@ Bells Core [MMP]
 
 (Credits to BlobMaster41)
 
-## What is Bells?
-Bells is the twin of DogeCoin, born before it, and just seen the lights now. [Visit blockchain explorer](https://belscan.io/)
+## What is MmpCoin?
+MmpCoin is the twin of DogeCoin, born before it, and just seen the lights now. [Visit blockchain explorer](https://belscan.io/)
 
 ## Development and contributions
 Developers work in their own trees, then submit pull requests when they think
@@ -24,9 +24,9 @@ their feature or bug fix is ready.
 
 ## Usage 💻
 
-To start your journey with Bells Core, see the [installation guide](INSTALL.md) and the [getting started](doc/getting-started.md) tutorial.
+To start your journey with MmpCoin Core, see the [installation guide](INSTALL.md) and the [getting started](doc/getting-started.md) tutorial.
 
-The JSON-RPC API provided by Bells Core is self-documenting and can be browsed with `mmpcoin-cli help`, while detailed information for each command can be viewed with `mmpcoin-cli help <command>`. Alternatively, see the [Bitcoin Core documentation](https://developer.bitcoin.org/reference/rpc/) - which implement a similar protocol - to get a browsable version.
+The JSON-RPC API provided by MmpCoin Core is self-documenting and can be browsed with `mmpcoin-cli help`, while detailed information for each command can be viewed with `mmpcoin-cli help <command>`. Alternatively, see the [Bitcoin Core documentation](https://developer.bitcoin.org/reference/rpc/) - which implement a similar protocol - to get a browsable version.
 
 ## Frequently Asked Questions
 
@@ -61,6 +61,6 @@ After block 518,400 (~1 year), reward of 2 coins.
 - Added peer seeding
 
 ## License ⚖️
-Bells Core is released under the terms of the MIT license. See
+MmpCoin Core is released under the terms of the MIT license. See
 [COPYING](COPYING) for more information or see
 [opensource.org](https://opensource.org/licenses/MIT)

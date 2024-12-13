@@ -1,9 +1,9 @@
 [Desktop Entry]
-Name=Bells Core
-Comment=Connect to the Bells P2P Network
-Comment[de]=Verbinde mit dem Bells peer-to-peer Netzwerk
-Comment[fr]=Bells, monnaie virtuelle cryptographique pair à pair
-Comment[tr]=Bells, eşten eşe kriptografik sanal para birimi
+Name=MmpCoin Core
+Comment=Connect to the MmpCoin P2P Network
+Comment[de]=Verbinde mit dem MmpCoin peer-to-peer Netzwerk
+Comment[fr]=MmpCoin, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=MmpCoin, eşten eşe kriptografik sanal para birimi
 Exec=mmpcoin-qt %u
 Terminal=false
 Type=Application

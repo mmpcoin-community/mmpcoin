@@ -68,9 +68,9 @@ can then be controlled by group membership.
 3b) Mac OS X
 
 Binary:              `/usr/local/bin/mmpcoind`  
-Configuration file:  `~/Library/Application Support/Bells/mmpcoin.conf`  
+Configuration file:  `~/Library/Application Support/MmpCoin/mmpcoin.conf`  
 Data directory:      `~/Library/Application Support/Dogecoin`
-Lock file:           `~/Library/Application Support/Bells/.lock`
+Lock file:           `~/Library/Application Support/MmpCoin/.lock`
 
 4. Installing Service Configuration
 -----------------------------------

@@ -76,7 +76,7 @@ public:
     CMainParams() {
         strNetworkID = "main";
 
-        // Not used in Bells
+        // Not used in MmpCoin
         consensus.nSubsidyHalvingInterval = 100000;
 
         consensus.nMajorityEnforceBlockUpgrade = 1500;
@@ -120,7 +120,7 @@ public:
 
 
         // Deployment of BIP68, BIP112, and BIP113.
-        // XXX: BIP heights and hashes all need to be updated to Bells values
+        // XXX: BIP heights and hashes all need to be updated to MmpCoin values
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 3;
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1703462400; // 2023-12-25 00:00:00
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1735084800;   // 2024-12-25 18:00:00
@@ -296,7 +296,7 @@ public:
 
 
         // Deployment of BIP68, BIP112, and BIP113.
-        // XXX: BIP heights and hashes all need to be updated to Bells values
+        // XXX: BIP heights and hashes all need to be updated to MmpCoin values
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 3;
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1703462400; // 2023-12-25 00:00:00
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1735084800;   // 2024-12-25 18:00:00
@@ -405,7 +405,7 @@ private:
 public:
     CRegTestParams() {
         strNetworkID = "regtest";
-        // Not used in Bells
+        // Not used in MmpCoin
         consensus.nSubsidyHalvingInterval = 100000;
 
         consensus.nMajorityEnforceBlockUpgrade = 1500;
@@ -449,7 +449,7 @@ public:
 
 
         // Deployment of BIP68, BIP112, and BIP113.
-        // XXX: BIP heights and hashes all need to be updated to Bells values
+        // XXX: BIP heights and hashes all need to be updated to MmpCoin values
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 3;
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1703462400; // 2023-12-25 00:00:00
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1735084800;   // 2024-12-25 18:00:00

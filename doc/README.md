@@ -1,4 +1,4 @@
-Bells Core 0.14.2
+MmpCoin Core 0.14.2
 =====================
 
 Development

@@ -33,7 +33,7 @@ Build Dogecoin Core
         git clone https://github.com/dogecoin/dogecoin
         cd dogecoin
 
-2.  Build Bells:
+2.  Build MmpCoin:
 
     Configure and build the headless dogecoin binaries as well as the GUI (if Qt is found).
 
@@ -58,15 +58,15 @@ Dogecoin Core is now available at `./src/mmpcoind`
 
 Before running, it's recommended you create an RPC configuration file.
 
-    echo -e "rpcuser=dogecoinrpc\nrpcpassword=$(xxd -l 16 -p /dev/urandom)" > "/Users/${USER}/Library/Application Support/Bells/mmpcoin.conf"
+    echo -e "rpcuser=dogecoinrpc\nrpcpassword=$(xxd -l 16 -p /dev/urandom)" > "/Users/${USER}/Library/Application Support/MmpCoin/mmpcoin.conf"
 
-    chmod 600 "/Users/${USER}/Library/Application Support/Bells/mmpcoin.conf"
+    chmod 600 "/Users/${USER}/Library/Application Support/MmpCoin/mmpcoin.conf"
 
 The first time you run mmpcoind, it will start downloading the blockchain. This process could take several hours.
 
 You can monitor the download process by looking at the debug.log file:
 
-    tail -f $HOME/Library/Application\ Support/Bells/debug.log
+    tail -f $HOME/Library/Application\ Support/MmpCoin/debug.log
 
 Other commands:
 -------

@@ -1,4 +1,4 @@
-Bells Core version 1.14.6 is now available from:
+MmpCoin Core version 1.14.6 is now available from:
 
   <https://github.com/dogecoin/dogecoin/releases/tag/v1.14.6/>
 

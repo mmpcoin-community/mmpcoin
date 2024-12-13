@@ -17,7 +17,7 @@ The data directory is the default location where the Dogecoin Core files are sto
 Platform | Data directory path
 ---------|--------------------
 Linux    | `$HOME/.dogecoin/`
-macOS    | `$HOME/Library/Application Support/Bells/`
+macOS    | `$HOME/Library/Application Support/MmpCoin/`
 Windows  | `%APPDATA%\Dogecoin\` <sup>[\[1\]](#note1)</sup>
 
 2. A custom data directory path can be specified with the `-datadir` option.

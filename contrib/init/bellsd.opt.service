@@ -8,7 +8,7 @@
 #/var/opt/mmpcoin/
 
 [Unit]
-Description=Bells's distributed currency daemon
+Description=MmpCoin's distributed currency daemon
 After=network.target
 
 [Service]
