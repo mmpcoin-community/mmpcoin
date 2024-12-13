@@ -46,7 +46,7 @@
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>CFBundleURLName</key>
-      <string>com.mmpcoin.BellsPayment</string>
+      <string>com.mmpcoin.MmpCoinPayment</string>
       <key>CFBundleURLSchemes</key>
       <array>
         <string>mmpcoin</string>

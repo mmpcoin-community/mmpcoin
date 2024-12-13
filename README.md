@@ -6,7 +6,7 @@ MmpCoin Core [MMP]
 
 <div align="center">
 
-[![BellsBadge](https://img.shields.io/badge/MmpCoin-Coin-blue)](https://dogecoin.com)
+[![MmpCoinBadge](https://img.shields.io/badge/MmpCoin-Coin-blue)](https://dogecoin.com)
 [![MuchWow](https://img.shields.io/badge/OG-Coin-yellow.svg)](https://dogecoin.com)
 
 </div>
