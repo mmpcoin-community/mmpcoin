@@ -30,7 +30,7 @@ Homepage: http://www.dogecoin.com/
 Vcs-Git: git://github.com/dogecoin/dogecoin.git
 Vcs-Browser: http://github.com/dogecoin/dogecoin
 
-Package: bellsd
+Package: mmpcoind
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - daemon
@@ -43,10 +43,10 @@ Description: peer-to-peer network based digital currency - daemon
  Full transaction history is stored locally at each client.  This
  requires 20+ GB of space, slowly growing.
  .
- This package provides the daemon, bellsd, and the CLI tool
+ This package provides the daemon, mmpcoind, and the CLI tool
  dogecoin-cli to interact with the daemon.
 
-Package: bells-qt
+Package: mmpcoin-qt
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - Qt GUI

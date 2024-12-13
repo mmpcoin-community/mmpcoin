@@ -1,6 +1,6 @@
 all:
-	$(MAKE) -C .. bells_test
+	$(MAKE) -C .. mmpcoin_test
 clean:
-	$(MAKE) -C .. bells_test_clean
+	$(MAKE) -C .. mmpcoin_test_clean
 check:
-	$(MAKE) -C .. bells_test_check
+	$(MAKE) -C .. mmpcoin_test_check

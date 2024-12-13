@@ -258,8 +258,8 @@
         <translation>Thanh công cụ (toolbar)</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and bells: URIs)</source>
-        <translation>Yêu cầu thanh toán(tạo mã QR và địa chỉ bells: URLs)</translation>
+        <source>Request payments (generates QR codes and mmpcoin: URIs)</source>
+        <translation>Yêu cầu thanh toán(tạo mã QR và địa chỉ mmpcoin: URLs)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>

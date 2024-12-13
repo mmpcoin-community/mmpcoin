@@ -1,33 +1,33 @@
-# /etc/conf.d/bellsd: config file for /etc/init.d/bellsd
+# /etc/conf.d/mmpcoind: config file for /etc/init.d/mmpcoind
 
 # Config file location
-#bellsd_CONFIGFILE="/etc/bells/bells.conf"
+#mmpcoind_CONFIGFILE="/etc/mmpcoin/mmpcoin.conf"
 
-# What directory to write pidfile to?  (created and owned by $bellsd_USER)
-#bellsd_PIDDIR="/var/run/bellsd"
+# What directory to write pidfile to?  (created and owned by $mmpcoind_USER)
+#mmpcoind_PIDDIR="/var/run/mmpcoind"
 
 # What filename to give the pidfile
-#bellsd_PIDFILE="${bellsd_PIDDIR}/bellsd.pid"
+#mmpcoind_PIDFILE="${mmpcoind_PIDDIR}/mmpcoind.pid"
 
-# Where to write bellsd data (be mindful that the blockchain is large)
-#bellsd_DATADIR="/var/lib/bellsd"
+# Where to write mmpcoind data (be mindful that the blockchain is large)
+#mmpcoind_DATADIR="/var/lib/mmpcoind"
 
-# User and group to own bellsd process
-#bellsd_USER="bells"
-#bellsd_GROUP="bells"
+# User and group to own mmpcoind process
+#mmpcoind_USER="mmpcoin"
+#mmpcoind_GROUP="mmpcoin"
 
-# Path to bellsd executable
-#bellsd_BIN="/usr/bin/bellsd"
+# Path to mmpcoind executable
+#mmpcoind_BIN="/usr/bin/mmpcoind"
 
-# Nice value to run bellsd under
-#bellsd_NICE=0
+# Nice value to run mmpcoind under
+#mmpcoind_NICE=0
 
 # Additional options (avoid -conf and -datadir, use flags above)
-bellsd_OPTS="-disablewallet"
+mmpcoind_OPTS="-disablewallet"
 
-# The timeout in seconds OpenRC will wait for bellsd to terminate
+# The timeout in seconds OpenRC will wait for mmpcoind to terminate
 # after a SIGTERM has been raised.
 # Note that this will be mapped as argument to start-stop-daemon's
 # '--retry' option, which means you can specify a retry schedule
 # here. For more information see man 8 start-stop-daemon.
-bellsd_SIGTERM_TIMEOUT=60
+mmpcoind_SIGTERM_TIMEOUT=60

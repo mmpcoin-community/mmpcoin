@@ -1,6 +1,6 @@
 [Protocol]
-exec=bells-qt '%u'
-protocol=bells
+exec=mmpcoin-qt '%u'
+protocol=mmpcoin
 input=none
 output=none
 helper=true

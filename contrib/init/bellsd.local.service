@@ -2,9 +2,9 @@
 #
 # The relevant paths are:
 #
-#/usr/local/bin/bellsd
-#/usr/local/etc/bells/
-#/var/local/bells/
+#/usr/local/bin/mmpcoind
+#/usr/local/etc/mmpcoin/
+#/var/local/mmpcoin/
 
 [Unit]
 Description=Bells's distributed currency daemon
@@ -12,7 +12,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/bellsd -conf=/usr/local/etc/bells/bells.conf -datadir=/var/local/bells
+ExecStart=/usr/local/bin/mmpcoind -conf=/usr/local/etc/mmpcoin/mmpcoin.conf -datadir=/var/local/mmpcoin
 
 KillSignal=SIGINT
 Restart=always
@@ -22,8 +22,8 @@ TimeoutStartSec=5
 StartLimitIntervalSec=120
 StartLimitBurst=5
 
-User=bells
-Group=bells
+User=mmpcoin
+Group=mmpcoin
 
 ### Restrict resource consumption
 MemoryAccounting=yes
@@ -40,8 +40,8 @@ TemporaryFileSystem=/:ro
 BindReadOnlyPaths=/etc/ /lib/ /lib64/
 
 # Add daemon paths
-BindReadOnlyPaths=/usr/local/bin/bellsd /usr/local/etc/bells/
-BindPaths=/var/local/bells/
+BindReadOnlyPaths=/usr/local/bin/mmpcoind /usr/local/etc/mmpcoin/
+BindPaths=/var/local/mmpcoin/
 
 ### Restrict access to system.
 

@@ -2,13 +2,13 @@
 
 *.exe
 src/dogecoin
-src/bellsd
-src/bells-cli
-src/bells-tx
-src/test/test_bells
-src/test/test_bells_fuzzy
-src/qt/test/test_bells-qt
-src/bench/bench_bells
+src/mmpcoind
+src/mmpcoin-cli
+src/mmpcoin-tx
+src/test/test_mmpcoin
+src/test/test_mmpcoin_fuzzy
+src/qt/test/test_mmpcoin-qt
+src/bench/bench_mmpcoin
 
 # autoreconf
 Makefile.in
@@ -75,14 +75,14 @@ src/qt/test/moc*.cpp
 # Compilation and Qt preprocessor part
 *.qm
 Makefile
-bells-qt
-bells-qt
+mmpcoin-qt
+mmpcoin-qt
 Bitcoin-Qt.app
 
 # Unit-tests
 Makefile.test
-bells-qt_test
-bells-qt_test
+mmpcoin-qt_test
+mmpcoin-qt_test
 src/test/buildenv.py
 
 # Resources cpp
@@ -128,5 +128,5 @@ stage/
 *.iws
 *.iml
 *.ipr
-src/bells-cli
-src/bells-cli
+src/mmpcoin-cli
+src/mmpcoin-cli

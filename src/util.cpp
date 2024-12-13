@@ -104,8 +104,8 @@ namespace boost {
 
 using namespace std;
 
-const char * const BITCOIN_CONF_FILENAME = "bells.conf";
-const char * const BITCOIN_PID_FILENAME = "bellsd.pid";
+const char * const BITCOIN_CONF_FILENAME = "mmpcoin.conf";
+const char * const BITCOIN_PID_FILENAME = "mmpcoind.pid";
 
 CCriticalSection cs_args;
 map<string, string> mapArgs;
@@ -463,7 +463,7 @@ static std::string FormatException(const std::exception* pex, const char* pszThr
     char pszModule[MAX_PATH] = "";
     GetModuleFileNameA(NULL, pszModule, sizeof(pszModule));
 #else
-    const char* pszModule = "bells";
+    const char* pszModule = "mmpcoin";
 #endif
     if (pex)
         return strprintf(
@@ -502,7 +502,7 @@ boost::filesystem::path GetDefaultDataDir()
     return pathRet / "Library/Application Support/Bells";
 #else
     // Unix
-    return pathRet / ".bells";
+    return pathRet / ".mmpcoin";
 #endif
 #endif
 }

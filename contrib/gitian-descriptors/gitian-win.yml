@@ -1,5 +1,5 @@
 ---
-name: "bells-win-1.14"
+name: "mmpcoin-win-1.14"
 enable_cache: true
 suites:
 - "bionic"
@@ -24,7 +24,7 @@ packages:
 - "rename"
 remotes:
 - "url": "https://github.com/yarsawyer/mmpcoin.git"
-  "dir": "bells"
+  "dir": "mmpcoin"
 files: []
 script: |
   WRAP_DIR=$HOME/wrapped
@@ -94,7 +94,7 @@ script: |
   create_per-host_compiler_wrapper "2000-01-01 12:00:00"
   export PATH=${WRAP_DIR}:${PATH}
 
-  cd bells
+  cd mmpcoin
   BASEPREFIX=`pwd`/depends
   # Build dependencies for each host
   for i in $HOSTS; do
@@ -112,14 +112,14 @@ script: |
   ./autogen.sh
   CONFIG_SITE=${BASEPREFIX}/`echo "${HOSTS}" | awk '{print $1;}'`/share/config.site ./configure --prefix=/
   make dist
-  SOURCEDIST=`echo bells-*.tar.gz`
+  SOURCEDIST=`echo mmpcoin-*.tar.gz`
   DISTNAME=`echo ${SOURCEDIST} | sed 's/.tar.*//'`
 
   # Correct tar file order
   mkdir -p temp
   pushd temp
   tar xf ../$SOURCEDIST
-  find bells-* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
+  find mmpcoin-* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
   mkdir -p $OUTDIR/src
   cp ../$SOURCEDIST $OUTDIR/src
   popd
@@ -139,7 +139,7 @@ script: |
     make ${MAKEOPTS} -C src check-security
     make deploy
     make install DESTDIR=${INSTALLPATH}
-    cp -f bells-*setup*.exe $OUTDIR/
+    cp -f mmpcoin-*setup*.exe $OUTDIR/
     cd installed
     mv ${DISTNAME}/bin/*.dll ${DISTNAME}/lib/
     find . -name "lib*.la" -delete

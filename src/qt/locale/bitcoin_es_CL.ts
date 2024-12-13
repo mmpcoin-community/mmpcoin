@@ -206,8 +206,8 @@
         <translation>Barra de pestañas</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and bells: URIs)</source>
-        <translation>Pide pagos (genera codigos QR and bells: URls)</translation>
+        <source>Request payments (generates QR codes and mmpcoin: URIs)</source>
+        <translation>Pide pagos (genera codigos QR and mmpcoin: URls)</translation>
     </message>
     <message>
         <source>Error</source>

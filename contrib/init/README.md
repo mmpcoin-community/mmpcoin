@@ -1,11 +1,11 @@
 Sample configuration files for:
 
-SystemD: bellsd.service
-Upstart: bellsd.conf
-OpenRC:  bellsd.openrc
-         bellsd.openrcconf
-CentOS:  bellsd.init
-OS X:    org.bells.bellsd.plist
+SystemD: mmpcoind.service
+Upstart: mmpcoind.conf
+OpenRC:  mmpcoind.openrc
+         mmpcoind.openrcconf
+CentOS:  mmpcoind.init
+OS X:    org.mmpcoin.mmpcoind.plist
 
 have been made available to assist packagers in creating node packages here.
 

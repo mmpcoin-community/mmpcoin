@@ -1,6 +1,6 @@
 ## Getting started
 
-This tutorial will help you to go through the basics to use Dogecoin Core after you completed the [installation instructions](/INSTALL.md). You now have `bellsd` or `bells-qt` executables available to run a node, and `dogecoin-cli`/`dogecoin-tx` tools to help you transact DOGE.
+This tutorial will help you to go through the basics to use Dogecoin Core after you completed the [installation instructions](/INSTALL.md). You now have `mmpcoind` or `mmpcoin-qt` executables available to run a node, and `dogecoin-cli`/`dogecoin-tx` tools to help you transact DOGE.
 
 > **Note:** For simplicity, this guide assumes that executables can be found under the `PATH` environment variable.
 If needed, you can specify their location by typing `PATH=$PATH:/path/to/executables`, or prepend the full path to the command like:
@@ -26,14 +26,14 @@ If needed, you can specify their location by typing `PATH=$PATH:/path/to/executa
 
 ## Starting a Dogecoin node
 
-To start your node, you can run an headless server using `bellsd`:
+To start your node, you can run an headless server using `mmpcoind`:
 ```console
-shibetoshi:~$ bellsd -daemon
+shibetoshi:~$ mmpcoind -daemon
 ```
 
-Or you can use the Graphical User Interface (GUI), `bells-qt`:
+Or you can use the Graphical User Interface (GUI), `mmpcoin-qt`:
 ```console
-shibetoshi:~$ bells-qt
+shibetoshi:~$ mmpcoin-qt
 ```
 
 Detailed logging is recorded in `debug.log`, located in the [data directory](#data-directory).
@@ -41,7 +41,7 @@ Detailed logging is recorded in `debug.log`, located in the [data directory](#da
 
 Your node is now running and starts with a *synchronization process* that downloads the entire blockchain from other nodes. This operation will take many hours to complete, but you are now part of the Dogecoin network!
 
-> **Note:** The rest of this guide assumes the use of an headless node. The RPC server is not exposed with `bells-qt` until you activate the `-server` option as a startup argument, but inside the GUI application, you can use all the commands explored below (without `dogecoin-cli`) by going to `Help -> Debug window` and inside the popup window selecting the tab `Console`.
+> **Note:** The rest of this guide assumes the use of an headless node. The RPC server is not exposed with `mmpcoin-qt` until you activate the `-server` option as a startup argument, but inside the GUI application, you can use all the commands explored below (without `dogecoin-cli`) by going to `Help -> Debug window` and inside the popup window selecting the tab `Console`.
 
 ## Introduction to the JSON-RPC API
 
@@ -310,16 +310,16 @@ The `vout` structure will give you information about where the transaction outpu
 
 There are many parameters that can be configured to tune your node to your liking. There are two ways to change the configuration.
 
-Using `bellsd -help` will display all available configuration parameters that can be added as arguments:
+Using `mmpcoind -help` will display all available configuration parameters that can be added as arguments:
 
 **Command example :**
 ```console
-shibetoshi:~$ bellsd -daemon -paytxfee=0.01 -sendfreetransactions=1 -maxconnections=150
+shibetoshi:~$ mmpcoind -daemon -paytxfee=0.01 -sendfreetransactions=1 -maxconnections=150
 ```
 
-Configuration can be persisted by creating a `bells.conf` file. Create it in the directory defined with the `datadir` setting, `$HOME/.dogecoin` by default, or specify the file location with `-conf`.
+Configuration can be persisted by creating a `mmpcoin.conf` file. Create it in the directory defined with the `datadir` setting, `$HOME/.dogecoin` by default, or specify the file location with `-conf`.
 
-**bells.conf example :**
+**mmpcoin.conf example :**
 ```
 daemon=1
 server=1
@@ -328,7 +328,7 @@ paytxfee=0.01
 sendfreetransactions=1
 maxconnections=150
 ```
-You can see a more concrete example [here](/contrib/debian/examples/bells.conf).
+You can see a more concrete example [here](/contrib/debian/examples/mmpcoin.conf).
 
 ### Mainnet, testnet and regtest
 
@@ -338,7 +338,7 @@ When trying out new things, for example to test your application that interacts 
 **Testnet** : The test network, with peers.  
 **Regtest** : The regression test network, to test with only local peers and create blocks on-demand.
 
-When not specifying any network, *Mainnet* is the network used by default. To enable *testnet*, use the `bellsd -testnet`.
+When not specifying any network, *Mainnet* is the network used by default. To enable *testnet*, use the `mmpcoind -testnet`.
 
 To enable *regtest*, use the `-regtest` option.
 
