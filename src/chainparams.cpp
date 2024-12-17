@@ -94,7 +94,7 @@ public:
         consensus.powLimit = uint256S("0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20;
         consensus.nPowTargetTimespan = 20 * 60; // pre-digishield: 20 minutes
         consensus.nPowTargetSpacing = 60; // 1 minute
-        consensus.nCoinbaseMaturity = 90;
+        consensus.nCoinbaseMaturity = 100;
         consensus.fPowNoRetargeting = false;
 
 
@@ -312,7 +312,7 @@ public:
         // consensus.defaultAssumeValid = uint256S("0x2c05ea6918e28ca2d216c6518940c8782c09bebfe705d792155465662e275351"); // 10000
 
         // AuxPoW parameters
-        consensus.nAuxpowChainId = 0x00e6; // 320 - Josh Wise!
+        consensus.nAuxpowChainId = 0x00e6;
         consensus.fStrictChainId = true;
         consensus.fAllowLegacyBlocks = true;
 
@@ -464,7 +464,7 @@ public:
         // consensus.defaultAssumeValid = uint256S("0x2c05ea6918e28ca2d216c6518940c8782c09bebfe705d792155465662e275351"); // 10000
 
         // AuxPoW parameters
-        consensus.nAuxpowChainId = 0x00e6; // 320 - Josh Wise!
+        consensus.nAuxpowChainId = 0x00e6;
         consensus.fStrictChainId = true;
         consensus.fAllowLegacyBlocks = true;
 

@@ -128,85 +128,57 @@ bool CheckAuxPowProofOfWork(const CBlockHeader& block, const Consensus::Params& 
 
 CAmount GetDogecoinBlockSubsidy(int nHeight, const Consensus::Params& consensusParams, uint256 prevHash)
 {
-    CAmount nSubsidy = 2 * COIN;
+    CAmount nSubsidy = 100 * COIN;
 
-    if(nHeight < 101) {
-        nSubsidy = 2 * COIN; //first 100 blocks have minimal rewards
-    } else {
+    if (nHeight == 1) {
+        nSubsidy = 200000000 * COIN;
+    }else if(nHeight < 101){
+        nSubsidy = 2 * COIN;
+    }else if(nHeight < 129600){
 
-        int rand = generateMTRandom(nHeight, 1000);
+       int rand = generateMTRandom(nHeight, 1000);
+       if (rand >= 990) {
+           nSubsidy = 10000 * COIN;
+       } else if (rand >= 940) {
+           nSubsidy = 1000 * COIN;
+       } else if (rand >= 840) {
+           nSubsidy = 500 * COIN;
+       } else if (rand >= 700) {
+           nSubsidy = 250 * COIN;
+       } else if (rand >= 500) {
+           nSubsidy = 100 * COIN;
+       } else {
+           nSubsidy = 50 * COIN;
+       }
+   } else {
 
-        if (nHeight < 50000){ //luckcoin
-            std::string cseed_str = prevHash.ToString().substr(8,7);
-            const char* cseed = cseed_str.c_str();
-            long seed = hex2long(cseed);
+        // Wave-shaped release strategy parameters
+        int waveCycleLength = 129600; // 每个波浪周期的区块数
+        int waveAmplitude = 2;       // 波浪振幅，相对于基础奖励的倍数
+        // Calculate the wave cycle
+        int wavePosition = (nHeight - 1) % waveCycleLength;
 
-            int rand = generateMTRandom(seed, 100000);
-
-            if(rand > 30000 && rand < 35001)
-                nSubsidy = 188 * COIN;
-            else if(rand > 70000 && rand < 71001)
-                nSubsidy = 588 * COIN;
-            else if(rand > 50000 && rand < 50011)
-                nSubsidy = 5888 * COIN;
-        }else if (nHeight < 129600) { // bellscoin
-            if(rand >= 990) {
-                nSubsidy = 10000 * COIN;
-            } else if (rand >= 940) {
-                nSubsidy = 1000 * COIN;
-            } else if (rand >= 840) {
-                nSubsidy = 500 * COIN;
-            } else if (rand >= 700) {
-                nSubsidy = 250 * COIN;
-            } else if (rand >= 500) {
-                nSubsidy = 100 * COIN;
-            } else if (rand <= 499) {
-                nSubsidy = 50 * COIN;
-            }
-        } else if(nHeight < 259200) {
-            if (rand >= 990) {
-                nSubsidy = 5000 * COIN;
-            } else if (rand >= 940) {
-                nSubsidy = 500 * COIN;
-            } else if (rand >= 840) {
-                nSubsidy = 250 * COIN;
-            } else if (rand >= 700) {
-                nSubsidy = 125 * COIN;
-            } else if (rand >= 500) {
-                nSubsidy = 50 * COIN;
-            } else if (rand <= 499) {
-                nSubsidy = 25 * COIN;
-            }
-        } else if(nHeight < 518400) {
-            if (rand >= 990) {
-                nSubsidy = 500 * COIN;
-            } else if (rand >= 940) {
-                nSubsidy = 50 * COIN;
-            } else if (rand >= 840) {
-                nSubsidy = 25 * COIN;
-            } else if (rand >= 500) {
-                nSubsidy = 10 * COIN;
-            } else if (rand <= 499) {
-                nSubsidy = 5 * COIN;
-            }
+        // Calculate the wave-shaped reward
+        if (wavePosition < waveCycleLength / 2) {
+            // Upward slope
+            nSubsidy *= (1 + waveAmplitude * (wavePosition / (waveCycleLength / 2)));
         } else {
-            // Subsidy is cut in half every 100,000 blocks, which will occur approximately every 2 months
-            nSubsidy >>= (nHeight / 100000); // Luckycoin: 100K blocks in ~2 months
-
-            std::string cseed_str = prevHash.ToString().substr(8,7);
-            const char* cseed = cseed_str.c_str();
-            long seed = hex2long(cseed);
-
-            int rand = generateMTRandom(seed, 100000);
-
-            if(rand > 30000 && rand < 35001)
-                nSubsidy *= 2;
-            else if(rand > 70000 && rand < 71001)
-                nSubsidy *= 5;
-            else if(rand > 50000 && rand < 50011)
-                nSubsidy *= 58;
+            // Downward slope
+            nSubsidy *= (1 + waveAmplitude * ((waveCycleLength - wavePosition) / (waveCycleLength / 2)));
         }
-    }
+
+        // Increase with random rewards
+        std::string cseed_str = prevHash.ToString().substr(8,7);
+        const char* cseed = cseed_str.c_str();
+        long seed = hex2long(cseed);
+        int rand = generateMTRandom(seed, 100000);
+        if(rand > 30000 && rand < 35001)
+            nSubsidy += 188 * COIN;
+        else if(rand > 70000 && rand < 71001)
+            nSubsidy += 588 * COIN;
+        else if(rand > 50000 && rand < 50011)
+            nSubsidy += 5888 * COIN;
+   }
 
     return nSubsidy;
 
