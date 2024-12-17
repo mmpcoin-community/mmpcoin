@@ -29,29 +29,37 @@ The JSON-RPC API provided by MmpCoin Core is self-documenting and can be browsed
 ## Frequently Asked Questions
 
 ### How much mmpcoin can exist?
-Max supply of 500,000,000 coins with special rewards system.
+Max supply of 1,000,000,000 coins with special rewards system.
 
 ### How to get $mmp?
 Scrypt Proof of Work
 
-1 Minute Block Targets, 4 Hour Diff Readjustments
-
-* 50% chance of 50 coins
-* 20% chance of 100 coins
-* 14% chance of 250 coins
-* 10% chance of 500 coins
-* 5% chance of 1000 coins
-* 1% chance of 10000 coins
+1 Minute Block Targets, 20 minutes Diff Readjustments
+### Block 1 (Pre-mining)
+  * releases 200,000,000 coins for airdrop; specific rules will be updated on the official website later
+### Less than 129600 blocks
+  * Introducing the first phase release strategy of bellscoin
+    * 50% chance of 50 coins    
+    * 20% chance of 100 coins
+    * 14% chance of 250 coins
+    * 10% chance of 500 coins
+    * 5% chance of 1000 coins
+    * 1% chance of 10000 coins
+### More than 129600 blocks
+  * The release strategy employs a periodic parabolic reward pattern, with a base reward of 100 coins, reaching a peak of 300 coins within each 129,600 block cycle.
+  * Introducing the luckcoin lucky block mechanism
+    * 5% chance of getting regular coins + 188 coins (i.e. if regular coins are 100, you will get 288 coins)
+    * 1% chance of getting regular coins + 588 coins
+    * 0.01% chance of getting regular coins + 5888 coins
 
 Halving at 129600 (~90 days)
-Decreasing by 4/5ths at 259200 blocks (~180 days)
-After block 518,400 (~1 year), reward of 2 coins.
+After block 129600 (~6 year).
 
 ### Ports
 | Function | mainnet | testnet | regtest |
 | :------- |--------:| ------: | ------: |
-| P2P      |   19919 |   29919 |   18444 |
-| RPC      |   19918 |   29929 |   18332 |
+| P2P      |   10320 |   10420 |   10520 |
+| RPC      |   10319 |   10419 |   10519 |
 
 ## Change Log
 ### 0.7.0
