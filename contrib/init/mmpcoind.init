@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+#  mmpcoind The mmpcoin core server.
+#
+#
+# chkconfig: 345 80 20
+# description: mmpcoind
+# processname: mmpcoind
+#
+
+# Source function library.
+. /etc/init.d/functions
+
+# you can override defaults in /etc/sysconfig/mmpcoind, see below
+if [ -f /etc/sysconfig/mmpcoind ]; then
+        . /etc/sysconfig/mmpcoind
+fi
+
+RETVAL=0
+
+prog=mmpcoind
+# you can override the lockfile via mmpcoind_LOCKFILE in /etc/sysconfig/mmpcoind
+lockfile=${mmpcoind_LOCKFILE-/var/lock/subsys/mmpcoind}
+
+# mmpcoind defaults to /usr/bin/mmpcoind, override with mmpcoind_BIN
+mmpcoind=${mmpcoind_BIN-/usr/bin/mmpcoind}
+
+# mmpcoind opts default to -disablewallet, override with mmpcoind_OPTS
+mmpcoind_opts=${mmpcoind_OPTS--disablewallet}
+
+start() {
+    echo -n $"Starting $prog: "
+    daemon $DAEMONOPTS $mmpcoind $mmpcoind_opts
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc $prog
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f $lockfile
+    return $RETVAL
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status $prog
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage: service $prog {start|stop|status|restart}"
+        exit 1
+        ;;
+esac

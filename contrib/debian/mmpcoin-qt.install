@@ -1,0 +1,6 @@
+usr/local/bin/mmpcoin-qt usr/bin
+share/pixmaps/mmpcoin32.xpm usr/share/pixmaps
+share/pixmaps/mmpcoin16.xpm usr/share/pixmaps
+share/pixmaps/mmpcoin128.png usr/share/pixmaps
+debian/mmpcoin-qt.desktop usr/share/applications
+debian/mmpcoin-qt.protocol usr/share/kde4/services/
