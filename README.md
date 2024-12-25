@@ -14,7 +14,7 @@ MmpCoin Core [MMP]
 ## This branch contains the latest version 2.0.0 of the mmpcoin network.
 
 ## What is MmpCoin?
-MmpCoin is the twin of DogeCoin, born before it, and just seen the lights now. [Visit blockchain explorer](https://mmpcoin.com/)
+MMPCOIN was created by those who experienced a financial crisis due to investments in BellsCoin, LuckyCoin, and JunkCoin. The goal of MMPCOIN is to be the best in the universe—not just on the Moon, not just on Mars... CTMD.. [Visit blockchain explorer](https://mmpcoin.com/)
 
 ## Development and contributions
 Developers work in their own trees, then submit pull requests when they think
