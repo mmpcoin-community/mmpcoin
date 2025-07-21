@@ -45,7 +45,6 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 
 unsigned int GetNextWorkRequiredNewAlgo(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
-
     unsigned int nProofOfWorkLimit = UintToArith256(params.powLimit).GetCompact();
 
     // Genesis block or early blocks safety check
@@ -57,230 +56,197 @@ unsigned int GetNextWorkRequiredNewAlgo(const CBlockIndex* pindexLast, const CBl
         return nProofOfWorkLimit;
     }
 
-    // 🚀 Improved Digishield V3 Algorithm - Better handling of hashrate volatility
-    // Main improvements:
-    // 1. Enhanced hashrate surge handling
-    // 2. Smarter attack detection
-    // 3. Adaptive parameter adjustment
-
     const int64_t nTargetSpacing = params.nPowTargetSpacing;
-    int64_t nActualSpacing = pindexLast->GetBlockTime() - pindexLast->pprev->GetBlockTime();
-
-    // Time-related variables
+    const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
+    
+    // Get current time and time since last block
     int64_t nCurrentTime = GetTime();
     int64_t nTimeSinceLastBlock = nCurrentTime - pindexLast->GetBlockTime();
+    
+    // Calculate actual block spacing
+    int64_t nActualSpacing = pindexLast->GetBlockTime() - pindexLast->pprev->GetBlockTime();
+    
+    // Basic safety checks
+    const int64_t MIN_BLOCK_TIME = 1;  // Minimum 1 second
+    const int64_t MAX_BLOCK_TIME = nTargetSpacing * 100;  // Maximum 100x target time
+    nActualSpacing = std::max<int64_t>(nActualSpacing, MIN_BLOCK_TIME);
+    nActualSpacing = std::min<int64_t>(nActualSpacing, MAX_BLOCK_TIME);
 
-    // 🛡️ Enhanced security checks
-    const int64_t MAX_FUTURE_TIME = 2 * 60 * 60;
-    const int64_t MIN_BLOCK_TIME = nTargetSpacing / 20; // 5% of target time
-
-    // Timestamp validation
-    if (pindexLast->GetBlockTime() > nCurrentTime + MAX_FUTURE_TIME) {
-        LogPrintf("Warning: Block timestamp too far in future\n");
-        nTimeSinceLastBlock = nCurrentTime - pindexLast->GetMedianTimePast();
+    // =============================================================
+    // Emergency handling - simplified and effective
+    // =============================================================
+    
+    // Extreme emergency: no new block for over 20x target time
+    if (nTimeSinceLastBlock > 20 * nTargetSpacing) {
+        LogPrintf("EMERGENCY: No block for %ds, resetting to minimum difficulty\n", nTimeSinceLastBlock);
+        return bnPowLimit.GetCompact();
+    }
+    
+    // Critical delay: last block spacing over 10x target time
+    if (nActualSpacing > 10 * nTargetSpacing) {
+        LogPrintf("CRITICAL: Block spacing %ds (target %ds), emergency difficulty reduction\n", 
+                 nActualSpacing, nTargetSpacing);
+        
+        arith_uint256 bnEmergency;
+        bnEmergency.SetCompact(pindexLast->nBits);
+        
+        // Adjust based on delay severity
+        int emergencyFactor = std::min(nActualSpacing / nTargetSpacing, (int64_t)50);
+        bnEmergency *= emergencyFactor;
+        
+        if (bnEmergency > bnPowLimit) {
+            bnEmergency = bnPowLimit;
+        }
+        
+        LogPrintf("Emergency adjustment: %dx difficulty reduction\n", emergencyFactor);
+        return bnEmergency.GetCompact();
     }
 
-    nActualSpacing = std::max<int64_t>(nActualSpacing, MIN_BLOCK_TIME);
-
-    // 🔍 Enhanced historical analysis (extended to 24 blocks)
-    const int SECURITY_WINDOW = 24;
-    const int SHORT_WINDOW = 6;
+    // =============================================================
+    // Analyze recent block history
+    // =============================================================
+    
+    const int ANALYSIS_WINDOW = 12;  // Analyze last 12 blocks
     std::vector<int64_t> recentSpacings;
-    int64_t nLongAverage = 0;
-    int64_t nShortAverage = 0;
-
+    int64_t totalSpacing = 0;
+    
     const CBlockIndex* pindex = pindexLast;
-    for (int i = 0; i < SECURITY_WINDOW && pindex->pprev; i++) {
+    for (int i = 0; i < ANALYSIS_WINDOW && pindex->pprev; i++) {
         int64_t spacing = pindex->GetBlockTime() - pindex->pprev->GetBlockTime();
         spacing = std::max<int64_t>(spacing, MIN_BLOCK_TIME);
-        spacing = std::min<int64_t>(spacing, nTargetSpacing * 20);
+        spacing = std::min<int64_t>(spacing, MAX_BLOCK_TIME);
         
         recentSpacings.push_back(spacing);
-        nLongAverage += spacing;
-        
-        if (i < SHORT_WINDOW) {
-            nShortAverage += spacing;
-        }
-        
+        totalSpacing += spacing;
         pindex = pindex->pprev;
     }
-
-    if (!recentSpacings.empty()) {
-        nLongAverage /= recentSpacings.size();
-        nShortAverage /= std::min((int)recentSpacings.size(), SHORT_WINDOW);
+    
+    if (recentSpacings.empty()) {
+        // If no historical data, use current spacing
+        recentSpacings.push_back(nActualSpacing);
+        totalSpacing = nActualSpacing;
     }
-
-    // 🎯 Hashrate trend analysis
-    double hashrateTrend = 0;
-    if (nLongAverage > 0) {
-        hashrateTrend = (double)nShortAverage / (double)nLongAverage;
+    
+    int64_t averageSpacing = totalSpacing / recentSpacings.size();
+    
+    // Calculate average time for last 6 blocks (short-term trend)
+    int64_t shortTermAverage = 0;
+    int shortTermCount = std::min(6, (int)recentSpacings.size());
+    for (int i = 0; i < shortTermCount; i++) {
+        shortTermAverage += recentSpacings[i];
     }
+    shortTermAverage /= shortTermCount;
 
-    // 🛡️ Smart attack detection
-    bool bSuspiciousPattern = false;
-    bool bHashrateManipulation = false;
-    int volatilityScore = 0;
-
-    if (recentSpacings.size() >= 12) {
-        // Calculate volatility score
-        for (size_t i = 1; i < recentSpacings.size(); i++) {
-            double change = (double)recentSpacings[i] / (double)recentSpacings[i-1];
-            if (change > 3.0 || change < 0.33) {
-                volatilityScore++;
-            }
-        }
+    // =============================================================
+    // Attack detection - simplified but effective
+    // =============================================================
+    
+    bool bPossibleAttack = false;
+    
+    // Detect fast-slow alternating pattern (hashrate switching attack)
+    if (recentSpacings.size() >= 6) {
+        int fastBlocks = 0;
+        int slowBlocks = 0;
         
-        // Detect hashrate manipulation patterns
-        int fastBlocks = 0, slowBlocks = 0;
-        for (size_t i = 0; i < 6 && i < recentSpacings.size(); i++) {
-            if (recentSpacings[i] < nTargetSpacing / 2) fastBlocks++;
+        for (int i = 0; i < 6; i++) {
+            if (recentSpacings[i] < nTargetSpacing / 3) fastBlocks++;
             if (recentSpacings[i] > nTargetSpacing * 3) slowBlocks++;
         }
         
-        // Fast-slow alternation might be hashrate switching attack
+        // If both very fast and very slow blocks exist, possible attack
         if (fastBlocks >= 2 && slowBlocks >= 2) {
-            bHashrateManipulation = true;
-            LogPrintf("Warning: Possible hashrate switching attack detected\n");
-        }
-        
-        // High volatility indicates anomaly
-        if (volatilityScore > (int)(recentSpacings.size() / 3)) {
-            bSuspiciousPattern = true;
-            LogPrintf("Warning: High volatility detected (score: %d)\n", volatilityScore);
+            bPossibleAttack = true;
+            LogPrintf("Possible hashrate switching attack detected (fast:%d, slow:%d)\n", 
+                     fastBlocks, slowBlocks);
         }
     }
 
-    const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
-
-    // 🚀 Improved multi-level recovery mechanism
-    // Level 1: Extreme emergency
-    if (nActualSpacing > 30 * nTargetSpacing || nTimeSinceLastBlock > 30 * nTargetSpacing) {
-        LogPrintf("CRITICAL: Level 1 emergency activated\n");
-        if (bHashrateManipulation) {
-            // Even with attack detected, ensure network continues
-            arith_uint256 bnEmergency;
-            bnEmergency.SetCompact(pindexLast->nBits);
-            bnEmergency *= 10; // 90% reduction
-            if (bnEmergency > bnPowLimit) bnEmergency = bnPowLimit;
-            return bnEmergency.GetCompact();
-        }
-        return bnPowLimit.GetCompact();
-    }
-
-    // Level 2-4: Dynamic adjustment based on trends
+    // =============================================================
+    // Difficulty adjustment calculation
+    // =============================================================
+    
     arith_uint256 bnNew;
     bnNew.SetCompact(pindexLast->nBits);
-
-    int consecutiveFastBlocks = 0;
-
-    // 🎯 Choose adjustment strategy based on hashrate trend
-    if (hashrateTrend < 0.5 && nTimeSinceLastBlock > 3 * nTargetSpacing) {
-        // Hashrate dropping rapidly
-        LogPrintf("Hashrate dropping rapidly (trend: %.2f)\n", hashrateTrend);
-        int reductionPercent = 40 + (int)((0.5 - hashrateTrend) * 60);
-        reductionPercent = std::min(reductionPercent, 80);
-        
-        if (bHashrateManipulation) {
-            reductionPercent = std::min(reductionPercent, 50);
-        }
-        
-        bnNew *= (100 + reductionPercent);
-        bnNew /= 100;
-    } 
-    else if (hashrateTrend > 2.0 && nActualSpacing < nTargetSpacing / 2) {
-        // 🔥 Hashrate rising rapidly - this is the weakness of original algorithm
-        LogPrintf("Hashrate rising rapidly (trend: %.2f)\n", hashrateTrend);
-        
-        // Determine adjustment magnitude based on trend strength
-        int increasePercent = 30 + (int)((hashrateTrend - 2.0) * 20);
-        increasePercent = std::min(increasePercent, 100); // Maximum double
-        
-        // If continuous fast blocks, increase adjustment
-        consecutiveFastBlocks = 0;
-        for (size_t i = 0; i < std::min(size_t(6), recentSpacings.size()); i++) {
-            if (recentSpacings[i] < nTargetSpacing / 2) {
-                consecutiveFastBlocks++;
-            }
-        }
-        
-        if (consecutiveFastBlocks >= 4) {
-            increasePercent = std::min(increasePercent + 20, 150);
-            LogPrintf("Consecutive fast blocks detected, aggressive adjustment\n");
-        }
-        
-        bnNew *= 100;
-        bnNew /= (100 + increasePercent);
+    
+    // Choose which time interval to use for adjustment
+    int64_t adjustmentSpacing;
+    
+    if (bPossibleAttack) {
+        // Use long-term average during attack to reduce volatility
+        adjustmentSpacing = averageSpacing;
+        LogPrintf("Attack detected, using long-term average: %ds\n", adjustmentSpacing);
+    } else {
+        // Use short-term average for faster response in normal conditions
+        adjustmentSpacing = shortTermAverage;
     }
-    else {
-        // Normal Digishield V3 adjustment
-        bnNew *= nActualSpacing;
-        bnNew /= nTargetSpacing;
-    }
-
-    // 🛡️ Adaptive adjustment limits
-    int maxAdjustmentPercent = 25; // Base limit
-
-    // Dynamically adjust limits based on network state
-    if (volatilityScore < 2 && !bHashrateManipulation) {
-        // Network stable, allow larger adjustments
-        maxAdjustmentPercent = 40;
-    } else if (bHashrateManipulation) {
-        // Attack detected, tighten limits
-        maxAdjustmentPercent = 15;
-    } else if (volatilityScore > 5) {
-        // High volatility, conservative adjustment
-        maxAdjustmentPercent = 20;
-    }
-
-    // Special case overrides
-    if (nTimeSinceLastBlock > 10 * nTargetSpacing) {
-        // Long time without blocks, relax limits
-        maxAdjustmentPercent = std::max(maxAdjustmentPercent, 60);
-    } else if (nActualSpacing < nTargetSpacing / 3 && consecutiveFastBlocks >= 3) {
-        // Continuous fast blocks, allow significant difficulty increase
-        maxAdjustmentPercent = std::max(maxAdjustmentPercent, 80);
-    }
-
-    // Apply adjustment limits
+    
+    // Basic adjustment formula: new_difficulty = old_difficulty * target_time / actual_time
+    bnNew *= nTargetSpacing;
+    bnNew /= adjustmentSpacing;
+    
+    // =============================================================
+    // Adjustment limits - more reasonable ranges
+    // =============================================================
+    
     arith_uint256 bnPrevious;
     bnPrevious.SetCompact(pindexLast->nBits);
-
-    arith_uint256 bnUpper = bnPrevious * (100 + maxAdjustmentPercent) / 100;
-    arith_uint256 bnLower = bnPrevious * (100 - maxAdjustmentPercent) / 100;
-
-    if (bnNew > bnUpper) {
-        bnNew = bnUpper;
-        LogPrintf("Difficulty increase capped at %d%%\n", maxAdjustmentPercent);
-    } else if (bnNew < bnLower) {
-        bnNew = bnLower;
-        LogPrintf("Difficulty decrease capped at %d%%\n", maxAdjustmentPercent);
+    
+    // Set adjustment limits based on conditions
+    int maxIncrease, maxDecrease;
+    
+    if (bPossibleAttack) {
+        // More conservative during attack
+        maxIncrease = 25;  // Max 25% increase
+        maxDecrease = 25;  // Max 25% decrease
+    } else if (nTimeSinceLastBlock > 3 * nTargetSpacing) {
+        // Allow larger adjustments when no new blocks for long time
+        maxIncrease = 100; // Max 100% increase
+        maxDecrease = 75;  // Max 75% decrease
+    } else {
+        // Normal conditions
+        maxIncrease = 50;  // Max 50% increase
+        maxDecrease = 50;  // Max 50% decrease
     }
-
+    
+    // Apply limits
+    arith_uint256 bnMaxIncrease = bnPrevious * (100 - maxIncrease) / 100;  // Difficulty increase = bits decrease
+    arith_uint256 bnMaxDecrease = bnPrevious * (100 + maxDecrease) / 100;  // Difficulty decrease = bits increase
+    
+    if (bnNew < bnMaxIncrease) {
+        bnNew = bnMaxIncrease;
+        LogPrintf("Difficulty increase capped at %d%%\n", maxIncrease);
+    } else if (bnNew > bnMaxDecrease) {
+        bnNew = bnMaxDecrease;
+        LogPrintf("Difficulty decrease capped at %d%%\n", maxDecrease);
+    }
+    
     // Ensure not exceeding minimum difficulty
     if (bnNew > bnPowLimit) {
         bnNew = bnPowLimit;
     }
-
-    // 📊 Enhanced logging
-    LogPrintf("Enhanced Digishield V3 Adjustment:\n");
+    
+    // =============================================================
+    // Logging
+    // =============================================================
+    
+    double changePercent = ((double)bnNew.GetCompact() / (double)pindexLast->nBits - 1.0) * 100.0;
+    
+    LogPrintf("Improved Difficulty Adjustment:\n");
     LogPrintf("  Previous: %08x, New: %08x (%.2f%% change)\n", 
-            pindexLast->nBits, bnNew.GetCompact(),
-            ((double)bnNew.GetCompact() / pindexLast->nBits - 1) * 100);
-    LogPrintf("  Spacing: actual=%ds, target=%ds, since_last=%ds\n",
-            nActualSpacing, nTargetSpacing, nTimeSinceLastBlock);
-    LogPrintf("  Hashrate trend: %.2f, Volatility: %d, Max adjustment: %d%%\n",
-            hashrateTrend, volatilityScore, maxAdjustmentPercent);
-    LogPrintf("  Attack detection: Suspicious=%s, Manipulation=%s\n",
-            bSuspiciousPattern ? "YES" : "NO",
-            bHashrateManipulation ? "YES" : "NO");
-
-    // 🚨 Alert system
-    if (hashrateTrend > 5.0 || hashrateTrend < 0.2) {
-        LogPrintf("ALERT: Extreme hashrate change detected (%.2fx)\n", hashrateTrend);
+             pindexLast->nBits, bnNew.GetCompact(), changePercent);
+    LogPrintf("  Spacing: actual=%ds, short_avg=%ds, long_avg=%ds, target=%ds\n",
+             nActualSpacing, shortTermAverage, averageSpacing, nTargetSpacing);
+    LogPrintf("  Time since last: %ds, Attack detected: %s\n",
+             nTimeSinceLastBlock, bPossibleAttack ? "YES" : "NO");
+    LogPrintf("  Max adjustment: +%d%% -%d%%\n", maxIncrease, maxDecrease);
+    
+    // Warning system
+    double hashrateChange = (double)nTargetSpacing / (double)shortTermAverage;
+    if (hashrateChange > 3.0 || hashrateChange < 0.33) {
+        LogPrintf("ALERT: Significant hashrate change detected (%.2fx)\n", hashrateChange);
     }
-
+    
     return bnNew.GetCompact();
-
 }
 
 unsigned int GetNextWorkRequiredOldAlgo(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
