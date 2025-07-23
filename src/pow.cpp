@@ -34,7 +34,7 @@ bool AllowMinDifficultyForBlock(const CBlockIndex* pindexLast, const CBlockHeade
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
 
-    if (pindexLast->nHeight + 1 >= 155550) {
+    if (pindexLast->nHeight + 1 >= 155549) {
         // Use new improved algorithm
         return GetNextWorkRequiredNewAlgo(pindexLast, pblock, params);
     } else {
@@ -44,309 +44,226 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 
 }
 
-unsigned int GetNextWorkRequiredNewAlgo(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
-{
+unsigned int GetNextWorkRequiredNewAlgo(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params) {
     unsigned int nProofOfWorkLimit = UintToArith256(params.powLimit).GetCompact();
-
+    
     // Genesis block or early blocks safety check
     if (pindexLast == NULL || pindexLast->pprev == NULL) {
         return nProofOfWorkLimit;
     }
     
     // Special handling for specific block range if needed
-    if (pindexLast->nHeight >= 155550 && pindexLast->nHeight < 155650) {
+    if (pindexLast->nHeight < 155650) {
         return nProofOfWorkLimit;
     }
 
-    const int64_t nTargetSpacing = params.nPowTargetSpacing;
+    const int64_t nTargetSpacing = params.nPowTargetSpacing;  // 60 seconds
     const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
     
-    // Get current time and time since last block
-    int64_t nCurrentTime = GetTime();
-    int64_t nTimeSinceLastBlock = nCurrentTime - pindexLast->GetBlockTime();
-    
-    // Calculate actual block spacing
-    int64_t nActualSpacing = pindexLast->GetBlockTime() - pindexLast->pprev->GetBlockTime();
-    
-    // Basic safety checks
-    const int64_t MIN_BLOCK_TIME = 1;
-    const int64_t MAX_BLOCK_TIME = nTargetSpacing * 100;
-    nActualSpacing = std::max<int64_t>(nActualSpacing, MIN_BLOCK_TIME);
-    nActualSpacing = std::min<int64_t>(nActualSpacing, MAX_BLOCK_TIME);
-
     // =============================================================
-    // Death spiral protection - prevent chain death from hashrate crash
+    // EMERGENCY PROTECTION - Always check first
     // =============================================================
-
-    // Check for potential death spiral
-    bool bDeathSpiralRisk = false;
-    if (nTimeSinceLastBlock > 15 * nTargetSpacing) {  // Over 15 minutes without block
-        LogPrintf("DEATH SPIRAL RISK: No block for %ds (%.1f minutes)\n", 
-                 nTimeSinceLastBlock, (double)nTimeSinceLastBlock / 60.0);
-        bDeathSpiralRisk = true;
-    }
-
-    // Extreme emergency: immediately reset to minimum difficulty
-    if (bDeathSpiralRisk || nTimeSinceLastBlock > 30 * nTargetSpacing) {
-        LogPrintf("DEATH SPIRAL PROTECTION: Resetting to minimum difficulty immediately\n");
-        LogPrintf("Time since last block: %ds (%.1f minutes)\n", 
-                 nTimeSinceLastBlock, (double)nTimeSinceLastBlock / 60.0);
+    
+    // Get current time vs last block time (chain death protection)
+    int64_t nTimeSinceLastBlock = GetTime() - pindexLast->GetBlockTime();
+    
+    // If more than 2 hours since last block, emergency difficulty reduction
+    if (nTimeSinceLastBlock > 2 * 3600) {
+        LogPrintf("EMERGENCY: Chain stalled for %d minutes, resetting to minimum difficulty\n", 
+                  nTimeSinceLastBlock / 60);
         return bnPowLimit.GetCompact();
     }
-
-    // =============================================================
-    // Enhanced emergency handling with gradual recovery
-    // =============================================================
-
-    // Severe delay but not yet death spiral level
-    if (nActualSpacing > 3 * nTargetSpacing || nTimeSinceLastBlock > 5 * nTargetSpacing) {
-        LogPrintf("SEVERE DELAY: Block spacing %ds, time since last %ds\n", 
-                 nActualSpacing, nTimeSinceLastBlock);
+    
+    // If more than 30 minutes since last block, significant difficulty reduction
+    if (nTimeSinceLastBlock > 30 * 60) {
+        LogPrintf("CHAIN RECOVERY: Chain stalled for %d minutes, reducing difficulty\n", 
+                  nTimeSinceLastBlock / 60);
         
         arith_uint256 bnEmergency;
         bnEmergency.SetCompact(pindexLast->nBits);
         
-        // Calculate emergency adjustment factor with reasonable cap
-        int64_t delayFactor = std::max(nActualSpacing / nTargetSpacing, 
-                                       nTimeSinceLastBlock / nTargetSpacing);
-        int emergencyReduction = std::min(delayFactor, (int64_t)50);  // Max 50x reduction
-        
-        bnEmergency *= emergencyReduction;
-        
-        if (bnEmergency > bnPowLimit) {
-            bnEmergency = bnPowLimit;
+        // Scale reduction based on stall time
+        if (nTimeSinceLastBlock > 6 * 3600) {      // 6+ hours
+            bnEmergency *= 100;  // 100x easier
+        } else if (nTimeSinceLastBlock > 3 * 3600) { // 3-6 hours  
+            bnEmergency *= 50;   // 50x easier
+        } else if (nTimeSinceLastBlock > 1 * 3600) { // 1-3 hours
+            bnEmergency *= 20;   // 20x easier
+        } else {                                     // 30min-1hour
+            bnEmergency *= 10;   // 10x easier
         }
         
-        LogPrintf("Emergency difficulty reduction: %dx (capped at 50x)\n", emergencyReduction);
-        LogPrintf("New emergency difficulty: %08x\n", bnEmergency.GetCompact());
-        
+        if (bnEmergency > bnPowLimit) bnEmergency = bnPowLimit;
         return bnEmergency.GetCompact();
     }
-
+    
     // =============================================================
-    // Analyze recent block history
+    // ADAPTIVE ADJUSTMENT INTERVAL - Key stability improvement
     // =============================================================
     
-    const int ANALYSIS_WINDOW = 8;  // Analyze last 8 blocks
-    std::vector<int64_t> recentSpacings;
-    int64_t totalSpacing = 0;
+    // Use different adjustment frequencies based on network stability
+    int adjustmentInterval = 1;  // Default: every block
+    
+    // Calculate recent block time variance to determine stability
+    bool isNetworkStable = true;
+    if (pindexLast->nHeight >= 10) {  // Need at least 10 blocks
+        int64_t totalTime = 0;
+        int validBlocks = 0;
+        const CBlockIndex* pindex = pindexLast;
+        
+        // Check last 10 blocks for stability
+        for (int i = 0; i < 10 && pindex && pindex->pprev; i++) {
+            int64_t blockTime = pindex->GetBlockTime() - pindex->pprev->GetBlockTime();
+            if (blockTime > 0 && blockTime < 10 * nTargetSpacing) {  // Valid block time
+                totalTime += blockTime;
+                validBlocks++;
+            }
+            pindex = pindex->pprev;
+        }
+        
+        if (validBlocks >= 5) {
+            int64_t avgTime = totalTime / validBlocks;
+            // Network is stable if average is within 50% of target
+            isNetworkStable = (avgTime > nTargetSpacing / 2 && avgTime < nTargetSpacing * 2);
+        }
+    }
+    
+    // Set adjustment interval based on stability
+    if (isNetworkStable) {
+        adjustmentInterval = 12;  // Stable: adjust every 12 blocks (更稳定)
+    } else {
+        adjustmentInterval = 4;   // Unstable: adjust every 4 blocks  
+    }
+    
+    // Check if we should adjust difficulty this block
+    if ((pindexLast->nHeight + 1) % adjustmentInterval != 0) {
+        // Not an adjustment block, return current difficulty
+        return pindexLast->nBits;
+    }
+    
+    LogPrintf("Difficulty adjustment at block %d (interval: %d, stable: %s)\n", 
+              pindexLast->nHeight + 1, adjustmentInterval, isNetworkStable ? "yes" : "no");
+    
+    // =============================================================
+    // CALCULATE AVERAGE TIME OVER ADJUSTMENT WINDOW
+    // =============================================================
+    
+    int blocksToCheck = adjustmentInterval;
+    int64_t totalActualTime = 0;
+    int validTimeSpans = 0;
     
     const CBlockIndex* pindex = pindexLast;
-    for (int i = 0; i < ANALYSIS_WINDOW && pindex->pprev; i++) {
-        int64_t spacing = pindex->GetBlockTime() - pindex->pprev->GetBlockTime();
-        spacing = std::max<int64_t>(spacing, MIN_BLOCK_TIME);
-        spacing = std::min<int64_t>(spacing, MAX_BLOCK_TIME);
+    for (int i = 0; i < blocksToCheck && pindex && pindex->pprev; i++) {
+        int64_t blockTime = pindex->GetBlockTime() - pindex->pprev->GetBlockTime();
         
-        recentSpacings.push_back(spacing);
-        totalSpacing += spacing;
+        // Filter out extreme values
+        if (blockTime > 0 && blockTime < 20 * nTargetSpacing) {
+            totalActualTime += blockTime;
+            validTimeSpans++;
+        }
         pindex = pindex->pprev;
     }
     
-    if (recentSpacings.empty()) {
-        recentSpacings.push_back(nActualSpacing);
-        totalSpacing = nActualSpacing;
+    int64_t nActualSpacing;
+    if (validTimeSpans > 0) {
+        nActualSpacing = totalActualTime / validTimeSpans;
+    } else {
+        // Fallback to last two blocks
+        nActualSpacing = pindexLast->GetBlockTime() - pindexLast->pprev->GetBlockTime();
     }
     
-    int64_t averageSpacing = totalSpacing / recentSpacings.size();
+    // Safety limits
+    nActualSpacing = std::max<int64_t>(nActualSpacing, 1);
+    nActualSpacing = std::min<int64_t>(nActualSpacing, nTargetSpacing * 60);  // Max 1 hour
     
-    // Calculate short-term average (last 3 blocks)
-    int64_t shortTermAverage = 0;
-    int shortTermCount = std::min(3, (int)recentSpacings.size());
-    for (int i = 0; i < shortTermCount; i++) {
-        shortTermAverage += recentSpacings[i];
-    }
-    shortTermAverage /= shortTermCount;
-
     // =============================================================
-    // Hashrate volatility protection
-    // =============================================================
-
-    // Check recent difficulty adjustment history
-    bool bRecentLargeAdjustment = false;
-    if (pindexLast->pprev && pindexLast->pprev->pprev) {
-        double recentChange = (double)pindexLast->nBits / (double)pindexLast->pprev->nBits;
-        if (recentChange > 2.0 || recentChange < 0.5) {
-            bRecentLargeAdjustment = true;
-            LogPrintf("Recent large difficulty adjustment detected (%.2fx change)\n", recentChange);
-        }
-    }
-
-    // =============================================================
-    // Attack detection - simplified but effective
+    // DIGISHIELD-INSPIRED SMOOTHING FILTER
     // =============================================================
     
-    bool bPossibleAttack = false;
-    if (recentSpacings.size() >= 4) {
-        int fastBlocks = 0;
-        int slowBlocks = 0;
-        
-        for (size_t i = 0; i < std::min(size_t(6), recentSpacings.size()); i++) {
-            if (recentSpacings[i] < nTargetSpacing / 3) fastBlocks++;
-            if (recentSpacings[i] > nTargetSpacing * 3) slowBlocks++;
-        }
-        
-        // Fast-slow alternation might be hashrate switching attack
-        if (fastBlocks >= 2 && slowBlocks >= 2) {
-            bPossibleAttack = true;
-            LogPrintf("Possible hashrate switching attack detected (fast:%d, slow:%d)\n", 
-                     fastBlocks, slowBlocks);
-        }
-    }
-
+    int64_t nTargetTimespan = nTargetSpacing * adjustmentInterval;
+    int64_t nActualTimespan = nActualSpacing * adjustmentInterval;
+    
+    // Apply smoothing filter (inspired by DigiShield)
+    // Only take 1/6 of the deviation for more stability
+    int64_t nModulatedTimespan = nTargetTimespan + (nActualTimespan - nTargetTimespan) / 6;
+    
+    LogPrintf("Timespan calculation: actual=%ds, target=%ds, smoothed=%ds\n",
+              nActualTimespan, nTargetTimespan, nModulatedTimespan);
+    
     // =============================================================
-    // Difficulty adjustment calculation
+    // CALCULATE NEW DIFFICULTY
     // =============================================================
     
     arith_uint256 bnNew;
     bnNew.SetCompact(pindexLast->nBits);
     
-    // Choose which time interval to use for adjustment
-    int64_t adjustmentSpacing;
+    // Apply the standard formula with smoothed values
+    bnNew *= nModulatedTimespan;
+    bnNew /= nTargetTimespan;
     
-    if (bPossibleAttack || bRecentLargeAdjustment) {
-        // Use long-term average during attack or after large adjustments
-        adjustmentSpacing = averageSpacing;
-        LogPrintf("Using long-term average due to %s: %ds\n", 
-                 bPossibleAttack ? "attack detection" : "recent volatility", adjustmentSpacing);
-    } else {
-        // Use short-term average for faster response in normal conditions
-        adjustmentSpacing = shortTermAverage;
-    }
-    
-    // CORRECT formula: newBits = oldBits * actual_time / target_time
-    bnNew *= adjustmentSpacing;
-    bnNew /= nTargetSpacing;
-
     // =============================================================
-    // Adaptive adjustment limits
+    // ADAPTIVE ADJUSTMENT LIMITS
     // =============================================================
     
     arith_uint256 bnPrevious;
     bnPrevious.SetCompact(pindexLast->nBits);
     
-    // Set adjustment limits based on conditions
+    // More aggressive limits for unstable networks
     int maxIncrease, maxDecrease;
-    
-    if (bPossibleAttack) {
-        // Conservative during detected attack
-        maxIncrease = 25;
-        maxDecrease = 25;
-        LogPrintf("Attack detected - using conservative limits (±25%%)\n");
-    } else if (bRecentLargeAdjustment) {
-        // Moderate limits after recent large adjustments to prevent oscillation
-        maxIncrease = 40;
-        maxDecrease = 40;
-        LogPrintf("Recent volatility - using moderate limits (±40%%)\n");
-    } else if (nTimeSinceLastBlock > 2 * nTargetSpacing) {
-        // Allow larger adjustments when blocks are significantly delayed
-        maxIncrease = 150;
-        maxDecrease = 100;
-        LogPrintf("Significant delay - using aggressive limits (+150%% -100%%)\n");
+    if (!isNetworkStable) {
+        // Unstable network: allow bigger changes for faster recovery
+        maxIncrease = 75;   // Can increase by 75%
+        maxDecrease = 60;   // Can reduce by 60%
     } else {
-        // Normal conditions
-        maxIncrease = 75;
-        maxDecrease = 75;
+        // Stable network: smaller changes for stability
+        maxIncrease = 25;   // Max 25% increase (更保守)
+        maxDecrease = 25;   // Max 25% decrease
+    }
+    
+    // Special case: if blocks are consistently too fast, be more aggressive
+    if (nActualSpacing < nTargetSpacing / 3) {  // Less than 20 seconds
+        maxIncrease = 150;  // Can increase 2.5x
+        LogPrintf("Fast block protection: increasing max adjustment to %d%%\n", maxIncrease);
     }
     
     // Apply limits
-    arith_uint256 bnMaxIncrease = bnPrevious * (100 - maxIncrease) / 100;  // Difficulty increase = bits decrease
-    arith_uint256 bnMaxDecrease = bnPrevious * (100 + maxDecrease) / 100;  // Difficulty decrease = bits increase
+    arith_uint256 bnMax = bnPrevious * (100 + maxIncrease) / 100;
+    arith_uint256 bnMin = bnPrevious * (100 - maxDecrease) / 100;
     
-    bool adjustmentCapped = false;
-    if (bnNew < bnMaxIncrease) {
-        bnNew = bnMaxIncrease;
-        adjustmentCapped = true;
-        LogPrintf("Difficulty increase capped at %d%% (blocks too fast)\n", maxIncrease);
-    } else if (bnNew > bnMaxDecrease) {
-        bnNew = bnMaxDecrease;
-        adjustmentCapped = true;
-        LogPrintf("Difficulty decrease capped at %d%% (blocks too slow)\n", maxDecrease);
-    }
+    if (bnNew > bnMax) bnNew = bnMax;
+    if (bnNew < bnMin) bnNew = bnMin;
     
-    // Ensure not exceeding minimum difficulty
-    if (bnNew > bnPowLimit) {
-        bnNew = bnPowLimit;
-    }
-
+    // Never exceed minimum difficulty
+    if (bnNew > bnPowLimit) bnNew = bnPowLimit;
+    
     // =============================================================
-    // Force minimum meaningful adjustment when needed
+    // FINAL CHAIN DEATH PROTECTION
     // =============================================================
     
-    // Calculate actual change percentage
-    double actualChangePercent = ((double)bnNew.GetCompact() / (double)pindexLast->nBits - 1.0) * 100.0;
-    
-    // If change is too small and blocks are significantly off target, force larger change
-    if (!bPossibleAttack && !bRecentLargeAdjustment && abs(actualChangePercent) < 1.0) {
-        double targetDeviation = (double)adjustmentSpacing / (double)nTargetSpacing;
+    // If difficulty is still too high and recent blocks were slow, reduce more
+    double avgRecentTime = (double)nActualSpacing;
+    if (avgRecentTime > 5 * nTargetSpacing) {  // Average > 5 minutes
+        LogPrintf("Chain protection: Recent blocks too slow (%.1fs), reducing difficulty further\n", 
+                  avgRecentTime);
         
-        if (targetDeviation < 0.6 || targetDeviation > 1.4) {  // More than 40% deviation
-            LogPrintf("Forcing minimum 3%% adjustment due to significant timing deviation (%.1f%%)\n", 
-                     (targetDeviation - 1.0) * 100.0);
-            
-            if (adjustmentSpacing < nTargetSpacing) {
-                // Blocks too fast, increase difficulty by at least 3%
-                bnNew = bnPrevious * 97 / 100;
-            } else {
-                // Blocks too slow, decrease difficulty by at least 3%
-                bnNew = bnPrevious * 103 / 100;
-            }
-            
-            if (bnNew > bnPowLimit) {
-                bnNew = bnPowLimit;
-            }
-            
-            actualChangePercent = ((double)bnNew.GetCompact() / (double)pindexLast->nBits - 1.0) * 100.0;
-        }
+        // Additional reduction for chain protection
+        bnNew *= 2;  // Make it 2x easier
+        if (bnNew > bnPowLimit) bnNew = bnPowLimit;
     }
-
+    
     // =============================================================
-    // Enhanced logging and monitoring
+    // LOGGING
     // =============================================================
     
-    LogPrintf("Advanced Difficulty Adjustment Algorithm:\n");
-    LogPrintf("  Previous: %08x, New: %08x (%.2f%% change)\n", 
-             pindexLast->nBits, bnNew.GetCompact(), actualChangePercent);
-    LogPrintf("  Spacing: actual=%ds, short_avg=%ds, long_avg=%ds, target=%ds\n",
-             nActualSpacing, shortTermAverage, averageSpacing, nTargetSpacing);
-    LogPrintf("  Time since last: %ds, Adjustment spacing used: %ds\n",
-             nTimeSinceLastBlock, adjustmentSpacing);
-    LogPrintf("  Conditions: Attack=%s, RecentVolatility=%s, Capped=%s\n",
-             bPossibleAttack ? "YES" : "NO",
-             bRecentLargeAdjustment ? "YES" : "NO", 
-             adjustmentCapped ? "YES" : "NO");
-    LogPrintf("  Max adjustment limits: +%d%% -%d%%\n", maxIncrease, maxDecrease);
+    double changePercent = ((double)bnNew.GetCompact() / (double)pindexLast->nBits - 1.0) * 100.0;
     
-    // Warning system for extreme conditions
-    double hashrateChangeRatio = (double)nTargetSpacing / (double)shortTermAverage;
-    if (hashrateChangeRatio > 3.0 || hashrateChangeRatio < 0.33) {
-        LogPrintf("ALERT: Extreme hashrate change detected (%.2fx)\n", hashrateChangeRatio);
-    }
-    
-    if (averageSpacing < nTargetSpacing / 3 || averageSpacing > nTargetSpacing * 3) {
-        LogPrintf("WARNING: Average block time severely off target: %ds vs %ds\n", 
-                 averageSpacing, nTargetSpacing);
-    }
-
-    // Network health indicator
-    double networkStability = 1.0;
-    if (recentSpacings.size() >= 4) {
-        // Calculate coefficient of variation as stability metric
-        double variance = 0;
-        for (size_t i = 0; i < recentSpacings.size(); i++) {
-            double deviation = (double)recentSpacings[i] - (double)averageSpacing;
-            variance += deviation * deviation;
-        }
-        variance /= recentSpacings.size();
-        double stddev = sqrt(variance);
-        double cv = stddev / averageSpacing;  // Coefficient of variation
-        
-        networkStability = std::max(0.0, 1.0 - cv);  // Higher is more stable
-        LogPrintf("  Network stability index: %.2f (1.0=stable, 0.0=volatile)\n", networkStability);
-        
-        if (networkStability < 0.5) {
-            LogPrintf("WARNING: High network instability detected\n");
-        }
-    }
+    LogPrintf("Stable Difficulty Adjustment:\n");
+    LogPrintf("  %08x -> %08x (%.1f%% change)\n", 
+              pindexLast->nBits, bnNew.GetCompact(), changePercent);
+    LogPrintf("  Avg block time: %.1fs (target: %ds)\n", 
+              (double)nActualSpacing, nTargetSpacing);
+    LogPrintf("  Network stable: %s, Adjustment interval: %d\n", 
+              isNetworkStable ? "yes" : "no", adjustmentInterval);
     
     return bnNew.GetCompact();
 }
