@@ -65,32 +65,32 @@ unsigned int GetNextWorkRequiredNewAlgo(const CBlockIndex* pindexLast, const CBl
     // =============================================================
     
     // Get current time vs last block time (chain death protection)
-    int64_t nTimeSinceLastBlock = GetTime() - pindexLast->GetBlockTime();
+    int64_t nTimeSinceLastBlock = pblock->GetBlockTime() - pindexLast->GetBlockTime();
     
     // If more than 2 hours since last block, emergency difficulty reduction
     if (nTimeSinceLastBlock > 2 * 3600) {
-        LogPrintf("EMERGENCY: Chain stalled for %d minutes, resetting to minimum difficulty\n", 
+        LogPrintf("EMERGENCY: Block time gap %d minutes, resetting to minimum difficulty\n", 
                   nTimeSinceLastBlock / 60);
         return bnPowLimit.GetCompact();
     }
     
     // If more than 30 minutes since last block, significant difficulty reduction
     if (nTimeSinceLastBlock > 30 * 60) {
-        LogPrintf("CHAIN RECOVERY: Chain stalled for %d minutes, reducing difficulty\n", 
+        LogPrintf("CHAIN RECOVERY: Block time gap %d minutes, reducing difficulty\n", 
                   nTimeSinceLastBlock / 60);
         
         arith_uint256 bnEmergency;
         bnEmergency.SetCompact(pindexLast->nBits);
         
-        // Scale reduction based on stall time
+        // 根据延迟时间调整难度
         if (nTimeSinceLastBlock > 6 * 3600) {      // 6+ hours
-            bnEmergency *= 100;  // 100x easier
+            bnEmergency *= 100;
         } else if (nTimeSinceLastBlock > 3 * 3600) { // 3-6 hours  
-            bnEmergency *= 50;   // 50x easier
+            bnEmergency *= 50;
         } else if (nTimeSinceLastBlock > 1 * 3600) { // 1-3 hours
-            bnEmergency *= 20;   // 20x easier
+            bnEmergency *= 20;
         } else {                                     // 30min-1hour
-            bnEmergency *= 10;   // 10x easier
+            bnEmergency *= 10;
         }
         
         if (bnEmergency > bnPowLimit) bnEmergency = bnPowLimit;
